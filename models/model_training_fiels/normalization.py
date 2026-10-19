@@ -7,7 +7,7 @@ from pathlib import Path
 DATA_DIR = Path("dataset")
 IMAGE_SIZE = 128
 
-df = pd.read_csv(DATA_DIR / "labels.csv")
+df = pd.read_csv(DATA_DIR / "points.csv")
 
 images = []
 boxes = []
@@ -24,9 +24,7 @@ for josh, row in df.iterrows():
 
     height, width = image.shape[:2]
 
-    print(height, width, row["x1"], row["y1"], row["x2"], row["y2"], row["x1"] / width, row["y1"] / height, row["x2"] / width, row["y2"] / height)
-
-    box = np.array([np.clip(row["x1"] / width, 0, 1), np.clip(row["y1"] / height, 0, 1), np.clip(row["x2"] / width, 0, 1), np.clip(row["y2"] / height, 0, 1)], dtype=np.float32)
+    box = np.array([row["center_x"] / width, row["center_y"] / height], dtype=np.float32)
 
     # Resize and normalize image
     image = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE))
@@ -39,7 +37,7 @@ X = np.array(images, dtype=np.float32)
 y = np.array(boxes, dtype=np.float32)
 
 np.save(DATA_DIR / "X.npy", X)
-np.save(DATA_DIR / "y_labels.npy", y)
+np.save(DATA_DIR / "y.npy", y)
 
 print("Image data shape:", X.shape)
 print("Bounding-box data shape:", y.shape)
