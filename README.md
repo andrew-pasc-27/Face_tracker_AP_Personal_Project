@@ -76,12 +76,59 @@ The results are based on 17 test images. Although these images were new to the m
 
 The causes of the differences in performance between models require further investigation.
 
+## Vision Tracking and Servo Control
+After experimenting with multiple models, I decided to use 3 models for the final gimbal product: the augmented bounding box model, the model with confidence, and a pretrained OpenCV model (to test the accuracy of the servo control).
+
+### Converting Vision Tracking into Control
+All of the models return a bounding box and possibly a confidence score. By calculating how far the center of the bounding box deviates from the center of the webcam frame, we can find the pixel offset, which can then be translated into pan and tilt angles. The confidence score is used to determine whether the model is hallucinating a face.
+
+### Calculating Focal Length
+The listed focal field of view of my Logitech c270 webcam is 55° diagonally; it captures video at 1280 × 960 pixels. To convert pixel offsets into viewing angles, I calculated the camera's focal length in pixel units.
+
+First, I calculated the diagonal resolution:
+
+[
+d_p = \sqrt{1280^2+960^2}=1600\text{ pixels}
+]
+
+Using the diagonal FOV, the focal length is:
+
+[
+f = \frac{d_p/2}{\tan(\theta_d/2)}
+]
+
+where (d_p) is the diagonal pixel resolution and (\theta_d=55^\circ) is the diagonal FOV.
+
+[
+f = \frac{800}{\tan(27.5^\circ)}
+\approx 1538.6\text{ pixels}
+]
+
+Assuming square pixels and a rectilinear camera model, this gives an estimated focal length of approximately 1539 pixels. The corresponding horizontal and vertical fields of view are approximately 45.1° and 34.7°, respectively. (Using arctangent)
+
+Given a face center at pixel coordinates ((x_c,y_c)), the horizontal and vertical viewing angles relative to the image center can then be estimated as:
+
+[
+\alpha_x=\tan^{-1}\left(\frac{x_c-640}{1538.6}\right)
+]
+
+[
+\alpha_y=\tan^{-1}\left(\frac{y_c-480}{1538.6}\right)
+]
+
+These angles provide the basis for translating the face's position in the image into pan and tilt adjustments. The calculated focal length is an estimate based on the advertised FOV; actual camera calibration may differ due to lens distortion or cropping. 
+
+### Connection to Servo
+To ensure that the pan & tilt movements are smooth, I added a smoothing function. In short, it translates only a quarter of the pixel offset into pan & tilt movements, which lengthens the time it takes for the camera to reach the desired position. However, my computer does all of the preprocessing, the camera loop runs quickly and eliminates jitters. 
+<br>
+The Arduino is connected through serial and angle offsets are sent from a 90˚ center, so movement in both directions is possible. The Arduino waits for a command from my computer and executes once a `\n` is sent.
+
 ## Hardware and Tools
 
 ### Hardware
-- Webcam
-- Arduino-compatible microcontroller
-- Pan-tilt mount and servos
+- Webcam (Logi c270)
+- Arduino-compatible microcontroller (I used a nano)
+- Pan-tilt mount and servos (SG90)
 
 ### Software and Libraries
 - Python
