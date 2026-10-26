@@ -27,7 +27,7 @@ Annotation was implemented through OpenCV’s `selectROI()` method. Issues likel
 <br>
 ### 2. Data Augmentation
 I experimented with data augmentation to see whether modified images would increase the accuracy of the model on unseen images. 
-The image augmentations were implemented through OpenCV’s ‘flip()` and `convertScaleAbs()`. The images were flipped horizontally, flipped vertically, and modified in brightness for 4 augmentations per image.
+The image augmentations were implemented through OpenCV’s `flip()` and `convertScaleAbs()`. The images were flipped horizontally, flipped vertically, and modified in brightness for 4 augmentations per image.
 <br>
 For the dot model, augmentation likely has a very small effect due to its memorization of the general location of the face center; the augmented images have similar centers. However, when tested on the box model, augmentation improved accuracy significantly.
 <br>
