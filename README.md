@@ -87,34 +87,25 @@ The listed focal field of view of my Logitech c270 webcam is 55° diagonally; it
 
 First, I calculated the diagonal resolution:
 
-[
-d_p = \sqrt{1280^2+960^2}=1600\text{ pixels}
-]
+$$d_p = \sqrt{1280^2+960^2}=1600\text{ pixels}$$
 
 Using the diagonal FOV, the focal length is:
 
-[
-f = \frac{d_p/2}{\tan(\theta_d/2)}
-]
+$$f = \frac{d_p/2}{\tan(\theta_d/2)}$$
 
 where (d_p) is the diagonal pixel resolution and (\theta_d=55^\circ) is the diagonal FOV.
 
-[
-f = \frac{800}{\tan(27.5^\circ)}
-\approx 1538.6\text{ pixels}
-]
+$$f = \frac{800}{\tan(27.5^\circ)}
+\approx 1538.6\text{ pixels}$$
 
 Assuming square pixels and a rectilinear camera model, this gives an estimated focal length of approximately 1539 pixels. The corresponding horizontal and vertical fields of view are approximately 45.1° and 34.7°, respectively. (Using arctangent)
 
 Given a face center at pixel coordinates ((x_c,y_c)), the horizontal and vertical viewing angles relative to the image center can then be estimated as:
 
-[
-\alpha_x=\tan^{-1}\left(\frac{x_c-640}{1538.6}\right)
-]
+$$\alpha_x=\tan^{-1}\left(\frac{x_c-640}{1538.6}\right)$$
 
-[
-\alpha_y=\tan^{-1}\left(\frac{y_c-480}{1538.6}\right)
-]
+
+$$\alpha_y=\tan^{-1}\left(\frac{y_c-480}{1538.6}\right)$$
 
 These angles provide the basis for translating the face's position in the image into pan and tilt adjustments. The calculated focal length is an estimate based on the advertised FOV; actual camera calibration may differ due to lens distortion or cropping. 
 
