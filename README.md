@@ -110,8 +110,9 @@ The causes of the differences in performance between models require further inve
 | `aug_boxes_face_turret_model.keras` | Bounding box (augmented) | Best localization performance (~68 px error) |
 | `confidence_face_turret_model.keras` | Bounding box + confidence | Trained with blank images |
 | `boxes_face_turret_model.keras` | Bounding box | Non-augmented baseline |
-| `augmented_face_turret_model.keras` | Point / other | Intermediate experiments |
-| `augmented_mse_face_turret_model.keras` | Point / other | Intermediate experiments |
+| `augmented_face_turret_model.keras` | Point | Intermediate experiments |
+| `augmented_mse_face_turret_model.keras` | Point with mse loss func. | Intermediate experiments |
+| `face_detection_yunet_2023mar.onnx` | OpenCV YuNet Model | Gimbal testing and annotation workflow | 
 
 After experimenting with multiple models, I decided to use three for the final gimbal product: the augmented bounding-box model, the confidence model, and a pretrained OpenCV model (to test the accuracy of the servo control).
 
@@ -182,3 +183,16 @@ The Arduino is connected through serial and angle offsets are sent from a 90° c
 3. Load one of the models from the `models/` folder  
 4. Run a control script from `src/evaluation/arduino+webcam/`  
 5. Upload `arduino_face_turret.ino` to the Arduino Nano  
+
+## Build Process and Failures
+1. Dot Model Failure:
+    - The Dot Model failed to predict well because most of my initial dataset included faces near the center of the image. However, upon adding more images with my face off to the side, the model's performance failed to improve. It was okay with a semi-accurate loss score because patterns were harder to pick up with only a single point as a hotspot.
+2. Annotation Problems:
+    - Initial annotation was inconsistent and likely added some variance in my initial model's predictions. 
+    - I used YuNet's 2023 face tracking model in hope of getting better annotation results, iterating through my list of pictures and only re-annotating images the model could not recognize a face in. This way, the model controlled the accuracy of the annotations and any annotations of mine could be more accurate, since I was basing my annotations based off the YuNet model.
+3. GIoU Failure:
+    - Generalized Intersection over Union is a loss strategy that aims to penalize the model for poorly creating a bounding box over the face.
+    - It is better than mean squared error (mse) because it focuses on where the boxes overlap and do not overlap; mse only looks at the error between the boxes' coordinates.
+    - However, because the TensorFlow library in which it was previously stored has been deprecated, I needed to create my own.
+    - My implementation did not work; the model predicted that whole webcam frame included my face. While this is technically correct (my face IS in the camera), it isn't very helpful for tracking.
+    - Even after debugging, results failed to improve, so I ended up reverting back to using MSE. 
