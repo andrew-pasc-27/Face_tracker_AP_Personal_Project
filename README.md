@@ -2,6 +2,7 @@
 
 A face-tracking gimbal built with a custom-trained convolutional neural network (CNN), Python, and Arduino-controlled servos. The goal is to detect a face through a webcam and move a pan-tilt mount to follow it.
 
+![alt text](IMG_8257.jpeg)
 ---
 
 ## Project Overview
@@ -77,6 +78,8 @@ Because the webcam feed might not always contain a face, I introduced blank imag
 I implemented model evaluation in [`evaluate_model.py`](src/evaluation/model_tests/evaluate_model.py).
 
 I tested the dot model, augmented dot model, augmented bounding-box model, and confidence model on 17 new images that were not used during training.
+
+![alt text](image.png)
 
 The average pixel error between the predicted and expected face centers was:
 
@@ -157,6 +160,16 @@ To ensure that the pan & tilt movements are smooth, I added a smoothing function
 The Arduino is connected through serial and angle offsets are sent from a 90° center, so movement in both directions is possible. The Arduino waits for a command from my computer and executes once a `\n` is sent.
 
 ---
+
+## 3D Printing
+
+I used Onshape CAD and my school's 3D printer to create my physical model. I used makerworld files for the gimbal base, tweaking them to match my specifications and adding a custom webcam holder. 
+
+My first print didn't work very well. The webcam mount was a twentieth of an inch smaller than my webcam's width, which made the fit too snug. The gimbal did not allow for any tilt upwards, which was not ideal. The base was too small and caused the model to tip over.
+
+For my second print, I fixed all of these problems. I used a spline to create a curved mounting point for the webcam and tilt motor, allowing about 270 degrees of motion (which is more than enough). I expanded the base into a large x shape, which increased stability while keeping material cost relatively low. I increased the width of the webcam holder by decreasing the thickness of the side walls, adding a tenth of an inch to the webcam slot (I added a tenth to ensure fit). 
+
+This print also had its own issues. My motors were too tall for the mount, which meant I had to drill into the 3D print and hot glue the servo horns inside. While this fix wasn't ideal, it taught me how to improvise and make do with what I have. 
 
 ## Hardware and Tools
 
