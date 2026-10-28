@@ -2,9 +2,34 @@
 
 A face-tracking gimbal built with a custom-trained convolutional neural network (CNN), Python, and Arduino-controlled servos. The goal is to detect a face through a webcam and move a pan-tilt mount to follow it.
 
+---
+
 ## Project Overview
 
 I built and trained my own CNN to locate my face in webcam images for use in a face-tracking gimbal. I experimented with different ways of representing a face's location and investigated whether data augmentation could improve performance on images the model had not seen before.
+
+### Goals
+- Compare different approaches to face localization
+- Investigate how data augmentation affects performance on unseen images
+- Improve the stability and responsiveness of real-time face tracking
+- Connect the vision model to a physical tracking system
+
+---
+
+## Repository Structure
+
+| Path | Description |
+|------|-------------|
+| `models/` | Trained Keras models (`.keras`) |
+| `dataset/csv_files/` | Annotation CSVs (points and bounding boxes) |
+| `dataset/training_arrays/` | Preprocessed NumPy arrays used for training |
+| `src/dataset_creation/` | Scripts for capturing, annotating, augmenting, and normalizing data |
+| `src/model_training_files/` | Model architecture and training scripts |
+| `src/evaluation/` | Offline model evaluation scripts |
+| `src/arduino+webcam/` | Real-time control scripts + Arduino sketch |
+| `stl/` | 3D-printable files for the pan-tilt mount and webcam holder |
+
+---
 
 ## Methodology
 
@@ -24,10 +49,10 @@ I also tested a custom implementation of Generalized Intersection over Union (GI
 
 The bounding-box model returns four coordinates:
 
-- `x1`: Left edge
-- `y1`: Top edge
-- `x2`: Right edge
-- `y2`: Bottom edge
+- `x1`: Left edge  
+- `y1`: Top edge  
+- `x2`: Right edge  
+- `y2`: Bottom edge  
 
 These coordinates define the top-left and bottom-right corners of the bounding box. I implemented image annotation using OpenCV's `selectROI()` method. Inconsistent or inaccurate annotations may have contributed to training difficulties.
 
@@ -49,22 +74,22 @@ Because the webcam feed might not always contain a face, I introduced blank imag
 
 ### 4. Testing and Evaluation
 
-I implemented model evaluation in [`evaluate_model.py`](https://github.com/andrew-pasc-27/Face_tracker_AP_Personal_Project/blob/main/src/evaluation/model_tests/evaluate_model.py).
+I implemented model evaluation in [`evaluate_model.py`](src/evaluation/model_tests/evaluate_model.py).
 
 I tested the dot model, augmented dot model, augmented bounding-box model, and confidence model on 17 new images that were not used during training.
 
 The average pixel error between the predicted and expected face centers was:
 
-| Model | Average Center Error |
-|---|---:|
-| Dot model | 221.06 px |
-| Augmented dot model | 224.92 px |
-| Augmented bounding-box model | **67.94 px** |
-| Confidence model | 126.39 px |
+| Model                        | Average Center Error |
+|-----------------------------|---------------------:|
+| Dot model                   | 221.06 px            |
+| Augmented dot model         | 224.92 px            |
+| **Augmented bounding-box model** | **67.94 px**     |
+| Confidence model            | 126.39 px            |
 
 The confidence model's average predicted confidence was **0.9129**.
 
-The augmented bounding-box model performed best, achieving an average center error of 67.94 pixels—approximately 46% lower than the confidence model's error.
+The augmented bounding-box model performed best, achieving an average center error of 67.94 pixels — approximately 46% lower than the confidence model's error.
 
 The dot model and augmented dot model showed little improvement after augmentation, consistent with their tendency to predict near the center of the screen. In contrast, the augmented bounding-box model localized the face more accurately.
 
@@ -76,66 +101,84 @@ The results are based on 17 test images. Although these images were new to the m
 
 The causes of the differences in performance between models require further investigation.
 
+---
+
+## Models
+
+| File | Type | Notes |
+|------|------|-------|
+| `aug_boxes_face_turret_model.keras` | Bounding box (augmented) | Best localization performance (~68 px error) |
+| `confidence_face_turret_model.keras` | Bounding box + confidence | Trained with blank images |
+| `boxes_face_turret_model.keras` | Bounding box | Non-augmented baseline |
+| `augmented_face_turret_model.keras` | Point / other | Intermediate experiments |
+| `augmented_mse_face_turret_model.keras` | Point / other | Intermediate experiments |
+
+After experimenting with multiple models, I decided to use three for the final gimbal product: the augmented bounding-box model, the confidence model, and a pretrained OpenCV model (to test the accuracy of the servo control).
+
+---
+
 ## Vision Tracking and Servo Control
-After experimenting with multiple models, I decided to use 3 models for the final gimbal product: the augmented bounding box model, the model with confidence, and a pretrained OpenCV model (to test the accuracy of the servo control).
 
 ### Converting Vision Tracking into Control
+
 All of the models return a bounding box and possibly a confidence score. By calculating how far the center of the bounding box deviates from the center of the webcam frame, we can find the pixel offset, which can then be translated into pan and tilt angles. The confidence score is used to determine whether the model is hallucinating a face.
 
 ### Calculating Focal Length
-The listed focal field of view of my Logitech c270 webcam is 55° diagonally; it captures video at 1280 × 960 pixels. To convert pixel offsets into viewing angles, I calculated the camera's focal length in pixel units.
+
+The listed focal field of view of my Logitech C270 webcam is 55° diagonally; it captures video at 1280 × 960 pixels. To convert pixel offsets into viewing angles, I calculated the camera's focal length in pixel units.
 
 First, I calculated the diagonal resolution:
 
-$$d_p = \sqrt{1280^2+960^2}=1600\text{ pixels}$$
+$$d_p = \sqrt{1280^2 + 960^2} = 1600 \text{ pixels}$$
 
 Using the diagonal FOV, the focal length is:
 
-$$f = \frac{d_p/2}{\tan(\theta_d/2)}$$
+$$f = \frac{d_p / 2}{\tan(\theta_d / 2)}$$
 
-where ($$d_p$$) is the diagonal pixel resolution and ($$\theta_d=55^\circ$$) is the diagonal FOV.
+where \( d_p \) is the diagonal pixel resolution and \( \theta_d = 55^\circ \) is the diagonal FOV.
 
-$$f = \frac{800}{\tan(27.5^\circ)}
-\approx 1538.6\text{ pixels}$$
+$$f = \frac{800}{\tan(27.5^\circ)} \approx 1538.6 \text{ pixels}$$
 
-Assuming square pixels and a rectilinear camera model, this gives an estimated focal length of approximately 1539 pixels. The corresponding horizontal and vertical fields of view are approximately 45.1° and 34.7°, respectively. (Using arctangent)
+Assuming square pixels and a rectilinear camera model, this gives an estimated focal length of approximately 1539 pixels. The corresponding horizontal and vertical fields of view are approximately 45.1° and 34.7°, respectively.
 
-Given a face center at pixel coordinates ($$(x_c,y_c)$$), the horizontal and vertical viewing angles relative to the image center can then be estimated as:
+Given a face center at pixel coordinates \( (x_c, y_c) \), the horizontal and vertical viewing angles relative to the image center can then be estimated as:
 
-$$\alpha_x=\tan^{-1}\left(\frac{x_c-640}{1538.6}\right)$$
+$$\alpha_x = \tan^{-1}\left(\frac{x_c - 640}{1538.6}\right)$$
 
+$$\alpha_y = \tan^{-1}\left(\frac{y_c - 480}{1538.6}\right)$$
 
-$$\alpha_y=\tan^{-1}\left(\frac{y_c-480}{1538.6}\right)$$
-
-These angles provide the basis for translating the face's position in the image into pan and tilt adjustments. The calculated focal length is an estimate based on the advertised FOV; actual camera calibration may differ due to lens distortion or cropping. 
+These angles provide the basis for translating the face's position in the image into pan and tilt adjustments. The calculated focal length is an estimate based on the advertised FOV; actual camera calibration may differ due to lens distortion or cropping.
 
 ### Connection to Servo
-To ensure that the pan & tilt movements are smooth, I added a smoothing function. In short, it translates only a quarter of the pixel offset into pan & tilt movements, which lengthens the time it takes for the camera to reach the desired position. However, my computer does all of the preprocessing, the camera loop runs quickly and eliminates jitters. 
-<br>
-The Arduino is connected through serial and angle offsets are sent from a 90˚ center, so movement in both directions is possible. The Arduino waits for a command from my computer and executes once a `\n` is sent.
+
+To ensure that the pan & tilt movements are smooth, I added a smoothing function. In short, it translates only a quarter of the pixel offset into pan & tilt movements, which lengthens the time it takes for the camera to reach the desired position. However, my computer does all of the preprocessing, the camera loop runs quickly and eliminates jitters.
+
+The Arduino is connected through serial and angle offsets are sent from a 90° center, so movement in both directions is possible. The Arduino waits for a command from my computer and executes once a `\n` is sent.
+
+---
 
 ## Hardware and Tools
 
 ### Hardware
-- Webcam (Logi c270)
-- Arduino-compatible microcontroller (I used a nano)
-- Pan-tilt mount and servos (SG90)
+- Webcam: Logitech C270
+- Microcontroller: Arduino Nano (or compatible)
+- Servos: SG90 (pan + tilt)
+- Custom 3D-printed pan-tilt mount and webcam holder
 
 ### Software and Libraries
 - Python
-- TensorFlow/Keras
+- TensorFlow / Keras
 - OpenCV
 - NumPy
 - pandas
 - Arduino IDE
 
-## Goals
+---
 
-- Compare different approaches to face localization.
-- Investigate how data augmentation affects performance on unseen images.
-- Improve the stability and responsiveness of real-time face tracking.
-- Connect the vision model to a physical tracking system.
+## Getting Started
 
-## Project Status
-
-**In progress.** I am continuing to improve real-time tracking and integrate the vision system with the physical gimbal.
+1. Clone the repository  
+2. Install dependencies (TensorFlow, OpenCV, NumPy, pandas, pyserial)  
+3. Load one of the models from the `models/` folder  
+4. Run a control script from `src/evaluation/arduino+webcam/`  
+5. Upload `arduino_face_turret.ino` to the Arduino Nano  
