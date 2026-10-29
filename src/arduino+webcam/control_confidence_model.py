@@ -56,13 +56,15 @@ while True:
 
     height, width = frame.shape[:2]
 
+    #preprocess the images
     img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (128, 128))
     img = img.astype(np.float32) / 255.0
     img = np.expand_dims(img, axis=0)
 
+    #get model prediction and confidence
     prediction = model.predict(img, verbose=0)
-    coordinates = prediction["bbox"][0]
+    coordinates = prediction["bbox"][0] 
     confidence = float(prediction["confidence"][0][0])
 
     x1 = int(np.clip(coordinates[0], 0, 1) * width)
@@ -70,6 +72,7 @@ while True:
     x2 = int(np.clip(coordinates[2], 0, 1) * width)
     y2 = int(np.clip(coordinates[3], 0, 1) * height)
 
+    #only add a quarter of the offset to ensure smoothness
     face_center = np.array([((x1 + x2) / 2) / width, ((y1 + y2) / 2) / height], dtype=np.float32)
     smoothed_center += SMOOTHING * (face_center - smoothed_center)
 
@@ -79,9 +82,10 @@ while True:
 
     FOCAL_LENGTH_PX = 1538.6
     angular_offset = np.arctan(pixel_offset / FOCAL_LENGTH_PX)
-
+    #use tangent to calculate the angle of offset for the pan and tilt axes
     angular_offset_deg = np.degrees(angular_offset)
 
+    #converted to degrees and capped
     pan = int(round(SERVO_CENTER - angular_offset_deg[0] * PAN_GAIN))
     tilt = int(round(SERVO_CENTER - angular_offset_deg[1] * TILT_GAIN))
 
@@ -95,6 +99,7 @@ while True:
         y_distance = face_center_pixels[1] - last_sent_target[1]
         target_distance = np.sqrt(x_distance**2 + y_distance**2)
 
+    #only sent if the model is confident and theres a genuine change in pixels
     if (confidence >= CONFIDENCE_THRESHOLD
         and target_distance >= MINIMUM_TARGET_DISTANCE
         and now - last_send_time >= SEND_INTERVAL):

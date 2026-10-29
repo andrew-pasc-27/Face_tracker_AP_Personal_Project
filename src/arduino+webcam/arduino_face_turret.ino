@@ -19,6 +19,7 @@ void setup() {
 void loop() {
   while (Serial.available() > 0) {
     char c = Serial.read();
+    // if it sees a \n (the end of the command), it sends it to the below function for motor commands
     if (c == '\n') {
       handleCommand(serialLine);
       serialLine = "";

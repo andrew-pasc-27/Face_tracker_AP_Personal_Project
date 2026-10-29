@@ -8,11 +8,7 @@ predictions = np.load("dataset/test_predictions.npy")
 labels = pd.read_csv("dataset/test_labels.csv")
 CONFIDENCE_THRESHOLD = 0.5
 
-if predictions.ndim != 3 or predictions.shape[1] != 5 or predictions.shape[2] < 6:
-    raise ValueError(
-        "Prediction data does not include the confidence model. "
-        "Run get_prediction_values.py first to regenerate dataset/test_predictions.npy."
-    )
+#load the predictions
 
 for i in range(labels.shape[0]):
     filename = labels.iloc[i]["filename"]

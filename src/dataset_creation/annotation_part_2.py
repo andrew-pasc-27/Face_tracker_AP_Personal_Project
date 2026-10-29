@@ -8,7 +8,8 @@ IMAGE_DIR = DATA_DIR / "images"
 df = pd.read_csv(DATA_DIR / "points.csv")
 
 print(df.head())
-
+#for this file, i annotated the center still using selectroi, since its easy to use. 
+#I put the top left corner at the center of my face and only stored x1, y1 from the selectroi output. 
 for index, row in df.iterrows():
     filename = row["filename"]
     x, y = row["center_x"], row["center_y"]

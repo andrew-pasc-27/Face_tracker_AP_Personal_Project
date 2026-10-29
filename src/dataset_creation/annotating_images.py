@@ -19,12 +19,13 @@ for index, row in df.iterrows():
 
     print(f"Annotating {index + 1}/{len(df)}: {filename}")
 
+    #use selectroi to create bounding boxes around my face
     roi = cv2.selectROI(f"Face Annotation - {index + 1}", img, False)
     cv2.destroyAllWindows()
 
     x1, y1, w, h = roi
 
-    # If no box was selected, skip this image
+    # if no box was selected, skip this image
     if w == 0 or h == 0:
         print("Skipped image")
         continue
@@ -36,7 +37,7 @@ for index, row in df.iterrows():
         x1, y1, x2, y2
     ]
 
-    # Save after EVERY image so progress isn't lost
+    # save after EVERY image so progress isn't lost
     df.to_csv(DATA_DIR / "labels.csv", index=False)
 
 print("Annotation session complete!")

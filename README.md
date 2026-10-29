@@ -40,7 +40,7 @@ Using TensorFlow/Keras, I explored different ways to represent the location of t
 
 #### Dot Model
 
-I first trained the model using images annotated with a single point at the center of my face. This implementation showed poor results: the model tended to predict a point near the center of the screen rather than reliably locating the center of my face.
+I first trained the model using images annotated with a single point at the center of my face. This implementation showed poor results: the model tended to predict a point near the center of the screen rather than reliably locating the center of my face. When new images were added, the result improved slightly, though the true cause of its error is still unknown.
 
 #### Bounding Box Model
 
@@ -139,13 +139,13 @@ Using the diagonal FOV, the focal length is:
 
 $$f = \frac{d_p / 2}{\tan(\theta_d / 2)}$$
 
-where \( d_p \) is the diagonal pixel resolution and \( \theta_d = 55^\circ \) is the diagonal FOV.
+where ($ \d_p $) is the diagonal pixel resolution and $ \theta_d = 55^\circ $ is the diagonal FOV.
 
 $$f = \frac{800}{\tan(27.5^\circ)} \approx 1538.6 \text{ pixels}$$
 
 Assuming square pixels and a rectilinear camera model, this gives an estimated focal length of approximately 1539 pixels. The corresponding horizontal and vertical fields of view are approximately 45.1° and 34.7°, respectively.
 
-Given a face center at pixel coordinates \( (x_c, y_c) \), the horizontal and vertical viewing angles relative to the image center can then be estimated as:
+Given a face center at pixel coordinates $(\x_c, \y_c)$, the horizontal and vertical viewing angles relative to the image center can then be estimated as:
 
 $$\alpha_x = \tan^{-1}\left(\frac{x_c - 640}{1538.6}\right)$$
 
@@ -155,7 +155,7 @@ These angles provide the basis for translating the face's position in the image 
 
 ### Connection to Servo
 
-To ensure that the pan & tilt movements are smooth, I added a smoothing function. In short, it translates only a quarter of the pixel offset into pan & tilt movements, which lengthens the time it takes for the camera to reach the desired position. However, my computer does all of the preprocessing, the camera loop runs quickly and eliminates jitters.
+To ensure that the pan & tilt movements are smooth, I added a smoothing function. In short, it translates only a quarter of the pixel offset into pan & tilt movements, which lengthens the time it takes for the camera to reach the desired position. However, because my computer does all of the preprocessing, the camera loop runs quickly.
 
 The Arduino is connected through serial and angle offsets are sent from a 90° center, so movement in both directions is possible. The Arduino waits for a command from my computer and executes once a `\n` is sent.
 
@@ -167,9 +167,13 @@ I used Onshape CAD and my school's 3D printer to create my physical model. I use
 
 My first print didn't work very well. The webcam mount was a twentieth of an inch smaller than my webcam's width, which made the fit too snug. The gimbal did not allow for any tilt upwards, which was not ideal. The base was too small and caused the model to tip over.
 
-For my second print, I fixed all of these problems. I used a spline to create a curved mounting point for the webcam and tilt motor, allowing about 270 degrees of motion (which is more than enough). I expanded the base into a large x shape, which increased stability while keeping material cost relatively low. I increased the width of the webcam holder by decreasing the thickness of the side walls, adding a tenth of an inch to the webcam slot (I added a tenth to ensure fit). 
+For my second print, I fixed all of these problems. I used a spline to create a curved mounting point for the webcam and tilt motor, allowing 180 degrees of motion (which is more than enough). I expanded the base into a large x shape, which increased stability while keeping material cost relatively low. I increased the width of the webcam holder by decreasing the thickness of the side walls, adding a tenth of an inch to the webcam slot (I added a tenth to ensure fit). 
 
 This print also had its own issues. My motors were too tall for the mount, which meant I had to drill into the 3D print and hot glue the servo horns inside. While this fix wasn't ideal, it taught me how to improvise and make do with what I have. 
+
+Cited: https://makerworld.com/en/models/3248719-pan-tilt-camera-turret-for-9g-servos-sg90?from=search#profileId-3681538
+
+---
 
 ## Hardware and Tools
 
@@ -194,7 +198,7 @@ This print also had its own issues. My motors were too tall for the mount, which
 1. Clone the repository  
 2. Install dependencies (TensorFlow, OpenCV, NumPy, pandas, pyserial)  
 3. Load one of the models from the `models/` folder  
-4. Run a control script from `src/evaluation/arduino+webcam/`  
+4. Run a control script from `src/arduino+webcam/`  
 5. Upload `arduino_face_turret.ino` to the Arduino Nano  
 
 ## Build Process and Failures
@@ -206,6 +210,6 @@ This print also had its own issues. My motors were too tall for the mount, which
 3. GIoU Failure:
     - Generalized Intersection over Union is a loss strategy that aims to penalize the model for poorly creating a bounding box over the face.
     - It is better than mean squared error (mse) because it focuses on where the boxes overlap and do not overlap; mse only looks at the error between the boxes' coordinates.
-    - However, because the TensorFlow library in which it was previously stored has been deprecated, I needed to create my own.
+    - However, because TensorFlow Addons, where it was previously stored, has been deprecated, I needed to create my own.
     - My implementation did not work; the model predicted that whole webcam frame included my face. While this is technically correct (my face IS in the camera), it isn't very helpful for tracking.
     - Even after debugging, results failed to improve, so I ended up reverting back to using MSE. 
