@@ -2,7 +2,7 @@
 
 A face-tracking gimbal built with a custom-trained convolutional neural network (CNN), Python, and Arduino-controlled servos. The goal is to detect a face through a webcam and move a pan-tilt mount to follow it.
 
-![alt text](IMG_8257.jpeg)
+![alt text](photos/IMG_8257.jpeg)
 ---
 
 ## Project Overview
@@ -79,7 +79,7 @@ I implemented model evaluation in [`evaluate_model.py`](src/evaluation/model_tes
 
 I tested the dot model, augmented dot model, augmented bounding-box model, and confidence model on 17 new images that were not used during training.
 
-![alt text](image.png)
+![alt text](photos/image.png)
 
 The average pixel error between the predicted and expected face centers was:
 
