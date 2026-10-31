@@ -41,6 +41,7 @@ I built and trained my own CNN to locate my face in webcam images for use in a f
 | `src/evaluation/` | Offline model evaluation scripts |
 | `src/arduino+webcam/` | Real-time control scripts + Arduino sketch |
 | `stl/` | 3D-printable files for the pan-tilt mount and webcam holder |
+| `photos+videos/` | All relevant photos and videos |
 
 ---
 
