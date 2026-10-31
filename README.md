@@ -215,5 +215,5 @@ Cited: https://makerworld.com/en/models/3248719-pan-tilt-camera-turret-for-9g-se
     - Even after debugging, results failed to improve, so I ended up reverting back to using MSE.
   
 ## Videos:
-[Gimbal Movement Demonstration](https://youtu.be/ny2F1rEgIPg)
-[Face Tracking Demonstration](https://youtu.be/yfMTDygsv7o)
+- [Gimbal Movement Demonstration](https://youtu.be/ny2F1rEgIPg)
+- [Face Tracking Demonstration](https://youtu.be/yfMTDygsv7o)
