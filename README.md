@@ -91,7 +91,7 @@ I implemented model evaluation in [`evaluate_model.py`](src/evaluation/model_tes
 
 I tested the dot model, augmented dot model, augmented bounding-box model, and confidence model on 17 new images that were not used during training.
 
-![alt text](photos/image.png)
+![alt text](photos+videos/model_comparison.png)
 
 The average pixel error between the predicted and expected face centers was:
 
