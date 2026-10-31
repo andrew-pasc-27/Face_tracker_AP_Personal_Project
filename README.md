@@ -2,7 +2,7 @@
 
 A face-tracking gimbal built with a custom-trained convolutional neural network (CNN), Python, and Arduino-controlled servos. The goal is to detect a face through a webcam and move a pan-tilt mount to follow it.
 
-![alt text](photos+videos/gimbal_on_desk_2.png)
+![alt text](photos+videos/gimbal_on_desk.png)
 ---
 
 ## Table of Contents
