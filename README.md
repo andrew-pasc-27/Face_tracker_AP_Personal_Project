@@ -212,4 +212,8 @@ Cited: https://makerworld.com/en/models/3248719-pan-tilt-camera-turret-for-9g-se
     - It is better than mean squared error (mse) because it focuses on where the boxes overlap and do not overlap; mse only looks at the error between the boxes' coordinates.
     - However, because TensorFlow Addons, where it was previously stored, has been deprecated, I needed to create my own.
     - My implementation did not work; the model predicted that whole webcam frame included my face. While this is technically correct (my face IS in the camera), it isn't very helpful for tracking.
-    - Even after debugging, results failed to improve, so I ended up reverting back to using MSE. 
+    - Even after debugging, results failed to improve, so I ended up reverting back to using MSE.
+  
+## Videos:
+[Gimbal Movement Demonstration](https://youtu.be/ny2F1rEgIPg)
+[Face Tracking Demonstration](https://youtu.be/yfMTDygsv7o)
