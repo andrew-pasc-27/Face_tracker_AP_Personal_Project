@@ -2,8 +2,20 @@
 
 A face-tracking gimbal built with a custom-trained convolutional neural network (CNN), Python, and Arduino-controlled servos. The goal is to detect a face through a webcam and move a pan-tilt mount to follow it.
 
-![alt text](photos/IMG_8257.jpeg)
+![alt text](photos+videos/gimbal_on_desk_2.png)
 ---
+
+## Table of Contents
+- [Overview](#project-overview)
+- [Repo Structure](#repository-structure)
+- [Methodology](#methodology)
+- [Models](#models)
+- [Vision Tracking and Servo Control](#vision-tracking-and-servo-control)
+- [3D Prints](#3d-printing)
+- [Hardware and Tools](#hardware-and-tools)
+- [How to Get Started](#getting-started)
+- [Build Process and Failures](#build-process-and-failures)
+- [Videos](#videos)
 
 ## Project Overview
 
@@ -57,7 +69,7 @@ The bounding-box model returns four coordinates:
 
 These coordinates define the top-left and bottom-right corners of the bounding box. I implemented image annotation using OpenCV's `selectROI()` method. Inconsistent or inaccurate annotations may have contributed to training difficulties.
 
-Another issue was that the model could predict a face even when none was present. To investigate this, I developed a model with an additional confidence output.
+Another issue was that the model would predict a face even when none was present. To investigate this, I developed a model with an additional confidence output.
 
 ### 2. Data Augmentation
 
@@ -102,7 +114,12 @@ Although the confidence model produced a high average confidence score, its loca
 
 The results are based on 17 test images. Although these images were new to the models, this is a relatively small evaluation set, so the measured errors may not represent performance across different lighting conditions, backgrounds, face positions, or camera distances.
 
-The causes of the differences in performance between models require further investigation.
+The augmented bounding box model performed best, but still shows error in edge cases. The confidence model lessened error in cases with no face but at the cost of bounding box accuracy.
+
+With more time, the next steps would be: 
+- Collect a larger and more diverse dataset (planning to use SOLOFACE)
+- Add temporal filtering
+- Fine-tune the model using video.
 
 ---
 
@@ -171,6 +188,8 @@ For my second print, I fixed all of these problems. I used a spline to create a 
 
 This print also had its own issues. My motors were too tall for the mount, which meant I had to drill into the 3D print and hot glue the servo horns inside. While this fix wasn't ideal, it taught me how to improvise and make do with what I have. 
 
+![alt text](photos+videos/print2+print1.JPG)
+
 Cited: https://makerworld.com/en/models/3248719-pan-tilt-camera-turret-for-9g-servos-sg90?from=search#profileId-3681538
 
 ---
@@ -211,8 +230,8 @@ Cited: https://makerworld.com/en/models/3248719-pan-tilt-camera-turret-for-9g-se
     - Generalized Intersection over Union is a loss strategy that aims to penalize the model for poorly creating a bounding box over the face.
     - It is better than mean squared error (mse) because it focuses on where the boxes overlap and do not overlap; mse only looks at the error between the boxes' coordinates.
     - However, because TensorFlow Addons, where it was previously stored, has been deprecated, I needed to create my own.
-    - My implementation did not work; the model predicted that whole webcam frame included my face. While this is technically correct (my face IS in the camera), it isn't very helpful for tracking.
-    - Even after debugging, results failed to improve, so I ended up reverting back to using MSE.
+    - My implementation did not work initially; the model predicted that whole webcam frame included my face. While this is technically correct (my face IS in the camera), it isn't very helpful for tracking.
+    - After some help from Codex, I got a version of the loss function to work, however, the model stops improving its weights after its loss reaches 0.4, and the model does not perform very well.
   
 ## Videos:
 - [Gimbal Movement Demonstration](https://youtu.be/ny2F1rEgIPg)
