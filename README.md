@@ -2,7 +2,11 @@
 
 A face-tracking gimbal built with a custom-trained convolutional neural network (CNN), Python, and Arduino-controlled servos. The goal is to detect a face through a webcam and move a pan-tilt mount to follow it.
 
-![alt text](photos+videos/gimbal_on_desk_2.png)
+![alt text](photos+videos/gimbal_on_desk.png)
+
+## Videos:
+- [Gimbal Movement Demonstration](https://youtu.be/ny2F1rEgIPg)
+- [Face Tracking Demonstration](https://youtu.be/yfMTDygsv7o)
 ---
 
 ## Table of Contents
@@ -15,7 +19,6 @@ A face-tracking gimbal built with a custom-trained convolutional neural network 
 - [Hardware and Tools](#hardware-and-tools)
 - [How to Get Started](#getting-started)
 - [Build Process and Failures](#build-process-and-failures)
-- [Videos](#videos)
 
 ## Project Overview
 
@@ -41,6 +44,7 @@ I built and trained my own CNN to locate my face in webcam images for use in a f
 | `src/evaluation/` | Offline model evaluation scripts |
 | `src/arduino+webcam/` | Real-time control scripts + Arduino sketch |
 | `stl/` | 3D-printable files for the pan-tilt mount and webcam holder |
+| `photos+videos/` | All relevant photos and videos |
 
 ---
 
@@ -91,7 +95,7 @@ I implemented model evaluation in [`evaluate_model.py`](src/evaluation/model_tes
 
 I tested the dot model, augmented dot model, augmented bounding-box model, and confidence model on 17 new images that were not used during training.
 
-![alt text](photos/image.png)
+![alt text](photos+videos/model_comparison.png)
 
 The average pixel error between the predicted and expected face centers was:
 
@@ -233,6 +237,3 @@ Cited: https://makerworld.com/en/models/3248719-pan-tilt-camera-turret-for-9g-se
     - My implementation did not work initially; the model predicted that whole webcam frame included my face. While this is technically correct (my face IS in the camera), it isn't very helpful for tracking.
     - After some help from Codex, I got a version of the loss function to work, however, the model stops improving its weights after its loss reaches 0.4, and the model does not perform very well.
   
-## Videos:
-- [Gimbal Movement Demonstration](https://youtu.be/ny2F1rEgIPg)
-- [Face Tracking Demonstration](https://youtu.be/yfMTDygsv7o)
