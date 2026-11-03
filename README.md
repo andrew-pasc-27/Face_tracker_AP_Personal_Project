@@ -4,13 +4,11 @@ A face-tracking gimbal built with a custom-trained convolutional neural network 
 
 ![alt text](photos+videos/gimbal_on_desk.png)
 
-## Videos:
-- [Gimbal Movement Demonstration](https://youtu.be/ny2F1rEgIPg)
-- [Face Tracking Demonstration](https://youtu.be/yfMTDygsv7o)
 ---
 
 ## Table of Contents
 - [Overview](#project-overview)
+- [Demos](#demos)
 - [Repo Structure](#repository-structure)
 - [Methodology](#methodology)
 - [Models](#models)
@@ -29,6 +27,12 @@ I built and trained my own CNN to locate my face in webcam images for use in a f
 - Investigate how data augmentation affects performance on unseen images
 - Improve the stability and responsiveness of real-time face tracking
 - Connect the vision model to a physical tracking system
+
+---
+
+## Demos:
+- [Gimbal Movement Demonstration](https://youtu.be/ny2F1rEgIPg)
+- [Face Tracking Demonstration](https://youtu.be/yfMTDygsv7o)
 
 ---
 
